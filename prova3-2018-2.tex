@@ -6,6 +6,7 @@
 \usepackage{pdfsync}
 \usepackage[all]{xy}
 \usepackage{color}
+\usepackage{enumitem}
 
 \newcommand{\resposta}[1]{ \noindent {\bf Solução}.{\color{blue} #1}}
 
@@ -13,7 +14,7 @@
 Departamento de Ciência da Computação} \\[1cm]
 CIC 117536 - Projeto e Análise de Algoritmos \\[.5cm]  Terceira Prova \\[.5cm] Turma: B}
 \author{{\bf NP-completude}}
-\date{Prof. Flávio L. C. de Moura \\[.5cm] \today}
+\date{Prof. Flávio L. C. de Moura \\[.5cm] Alunos \\[.5cm] Matheus Stauffer Viana de Oliveira 16/0071852 \\[.5cm] Nícolas M. Schumacher 13/0047660\\[.5cm] \today}
 
 \begin{document}
 \maketitle
@@ -31,7 +32,46 @@ CIC 117536 - Projeto e Análise de Algoritmos \\[.5cm]  Terceira Prova \\[.5cm] 
 
  
   \resposta{
-    Escreva aqui sua solução.
+    Como no exemplo, assumimos o mesmo 2-SAT C:
+
+$$C = (x_1\lor \neg x_2)\land (\neg x_1 \lor \neg x_3) \land (x_1 \lor x_2) \land x_3$$
+$$C = (x_1\lor \neg x_2)\land (\neg x_1 \lor \neg x_3) \land (x_1 \lor x_2) \land (x_3 \lor x_3)$$
+
+A fim de executar um algoritmo em tempo polinomial sobre a fórmula booleana para identificar se ela é capaz de satisfação, será adotada uma nova representação desta expressão para o formato de um grafo direcionado G = (V, E).
+Os seguintes passos demonstram a construção do grafo G a partir do exemplo C apresentado. Sua generalização é trivial. Segue a construção de G:
+	\begin{enumerate}[label=\arabic*)]
+	    \item Cada variável booleana $x_1, x_2$ e $x_3$ de 2-SAT bem como todas as suas negações $\neg x_1, \neg x_2$ e $\neg x_3$ são vértices de G. Assim, $V = {x_1, x_2, x_3, \neg x_1, \neg x_2, \neg x_3}$.
+	    \item Para cada cláusula do tipo (A $\lor$ B), para todo A, B $\in$ V, originam-se as arestas ($\neg$A, B), ($\neg$B, A) $\in$ E.
+	\end{enumerate}
+
+O passo 2 ocorre porque a expressão (A $\lor$ B) é equivalente a $(\neg A \rightarrow B) \wedge (\neg B \rightarrow A)$, conforme prova a \textbf{Tabela 1}:
+
+$$\begin{array}{|c|c|c|c|c|c|c|c|}\hline
+      A & B & \neg A & \neg B & (\neg A \rightarrow B) & (\neg B \rightarrow A) & (\neg A \rightarrow B) \wedge (\neg B \rightarrow A) & (A \lor B)\\ \hline
+      0 & 0 & 1 & 1 & 0 & 0 & 0 & 0 \\ \hline
+      0 & 1 & 1 & 0 & 1 & 1 & 1 & 1 \\ \hline
+      1 & 0 & 0 & 1 & 1 & 1 & 1 & 1 \\ \hline
+      1 & 1 & 0 & 0 & 1 & 1 & 1 & 1 \\ \hline
+  \end{array}$$
+\textbf{Tabela 1}
+%A B ¬A ¬B (¬A -> B) (¬B -> A) (¬A -> B)^(¬B -> A) (A v B)
+%0 0  1  1     0         0              0             0
+%0 1  1  0     1         1              1             1
+%1 0  0  1     1         1              1             1
+%1 1  0  0     1         1              1             1
+%Tabela 1.
+
+	Isto é, as arestas ($\neg$A, B) e ($\neg$B, A) significam, respectivamente, que se A não é verdadeiro, então B deve ser verdadeiro, e se B é falso, A deve ser verdadeiro. Dessa forma será buscado o resultado 1 para cada cláusula (A $\lor$ B). Se for possível que cada uma delas tenha o valor 1, então a expressão inteira é igual a 1 e, portanto, é capaz de satisfação.
+	
+	O grafo G construído será capaz de satisfação se, e somente se, não houverem termos em contradição em qualquer um de seus componentes fortemente conectados, ou seja, se o resultado não for 0 em qualquer uma das cláusulas.
+	
+	Assim, quando existe um caminho em que é possível sair do vértice A e chegar em $\neg$A (ou ir de $\neg$A para A), haverá uma contradição e a fórmula será considerada incapaz de satisfação. Provamos isso por contradição:
+	
+	Seja o caminho x para $\neg$x e $\neg$x para x, para algum x em V, mas que também existe a atribuição p($x_1, x_2, x_3... x_n$) capaz de satisfazer a expressão. Assumimos que x = 1 de início. Digamos que no caminho de x para $\neg$x existe uma aresta (a, b). A partir da construção do grafo, essa aresta (a, b) existe se, e somente se, houver uma cláusula $(\neg a \lor b)$ na expressão. Esta aresta mostra que, se a = 1, então b = 1 para que a cláusula $(\neg a \lor b)$ seja verdadeira. Então, visto que x = 1, todos os literais no caminho de x até a, inclusive a, devem ser iguais a 1. Da mesma forma, todos os literais de b (inclusive) até $\neg$x devem ser iguais a 0, já que $\neg$x = 0. Porém isso resulta em uma aresta (a, b) tal que a = 1 e b = 0, tornando a cláusula falsa, o que é contraditório ao que foi assumido no início, portanto não há atribuição p($x_1, x_2, x_3... x_n$) capaz de satisfazer a expressão. Uma prova semelhante vale para o caso de x = 0.
+
+    A construção do grafo G a partir da expressão booleana pode ser realizada em O(n) para o passo 1, pois para cada literal diferente encontrado na expressão (ignorando a negação dele) este é adicionado ao conjunto de vértices V, bem como a negação dele e à medida que há mais literais diferentes, o tempo de execução deste trecho cresce linearmente. Para o passo 2, cada cláusula adicionará duas arestas ao conjunto E, e estas operações podem ser realizadas em tempo constante, fazendo também com que o tempo cresça linearmente à medida que o número de cláusulas aumenta. No total, para fins de simplificação e utilizando as propriedades da análise assintótica, a construção é realizada em O(n), ou seja, em tempo polinomial.
+    
+    Portanto, a checagem se existe algum x $\in$ V tal que haja um caminho de x para ¬x ou de ¬x para x permite determinar se a expressão pode ser satisfeita ou não. Nesse caso, um algoritmo de busca em largura, por exemplo, pode determinar se tal caminho existe. Visto que as operações de construção do algoritmo levam O(n) e sabendo que a busca em largura também pode operar em O(n), assim, podemos dizer que é possível determinar 2-SAT em tempo polinomial. Portanto, 2-SAT $\in$ P.
   }
   
 \item {\bf (2.5 pontos)} Em aula, assumimos que SAT é um problema
@@ -106,7 +146,56 @@ E todas as reduções (de 3-SAT para $Q'$, de $Q'$ para $Q$ e de $Q$ para HAM-CY
   intermediárias, caso existam, devem ser incluídas na solução.
 
   \resposta{
-    Escreva aqui sua solução.
+    Em nossa solução iremos realizar reduções do tipo 
+    $$\xymatrix{
+    2\mbox{-}SAT \ar[d] \\
+    3\mbox{-}SAT \ar[d] \\
+    FNCX\mbox{-}SAT 
+  }$$
+  
+  O primeiro ponto a se considerar é que 2-SAT$\in$P. De fato, podemos resolver instâncias de 2-SAT em tempo polinomial, conforme foi provado na questão 1.
+  
+  Suponhamos uma transformação $t$ que converte instâncias de 2-SAT em 3-SAT. Imaginemos o seguinte exemplo $\varphi$ de 2-SAT: $$\varphi: (x_1 \vee x_2) \wedge (x_3 \vee x_4)$$
+  
+  A transformação $t$ consiste em adicionar a todas as $n$ cláusulas possíveis de $\varphi$ um dos literais já existentes em cada respectiva cláusula. Para o $\varphi$ exemplo, um possível resultado seria:
+  
+  $$\varphi_t: (x_1 \vee x_2 \vee x_1) \wedge (x_3 \vee x_4 \vee x_4)$$
+  
+  Essa transformação é passível de ser realizada em tempo polinomial:
+  \newline
+  \begin{itemize}
+      \itemize 1. Para cada cláusula $C$ de $\varphi$ faça
+      \newline
+      \itemize 2. \quad Adicione à $C$ um dos literais já existentes em $C$
+  \end{itemize}
+  
+  No pseudocódigo acima, percorre-se cada cláusula $C$ de $\varphi$ uma única vez, e supondo que temos n literais no total, nossa complexidade resultante é O(n).
+  
+  Agora queremos uma transformação $r$ que mapeie instâncias de A $\vee$ B em A $\oplus$ B. Dessa maneira será possível reduzir instâncias de 3-SAT para FNCX-SAT.
+  
+  Conhecendo a tabela verdade de ambas as operações, uma possível proposição para $r$ seria verificar se os valores de verdade dos literais de uma cláusula são ambos verdadeiros. Se sim, o valor de A $\vee$ B seria verdadeiro, e, nesse caso, inverteríamos o valor de verdade resultante. Dessa maneira, teríamos uma tabela verdade resultante igual à operação $\oplus$.
+  
+  \begin{center}
+  \begin{tabular}{|c|c|c|c|c|} \hline
+      A & B & A $\vee$ B & A $\oplus$ B & (A $\vee$ B)_r\\ \hline
+      V & V & V & F & F & \hline
+      V & F & V & V & V & \hline
+      F & V & V & V & V & \hline
+      F & F & F & F & F & \hline
+  \end{tabular}
+  \end{center}
+  
+  Essa transformação é possível de ser realizada em tempo polinomial:
+  \begin{itemize}
+      \itemize 1. Para cada cláusula $C$ de uma entrada $\varphi$ faça      \newline
+      \itemize 2. \quad se algum literal de $C$ possui valor de verdade FALSO então      \newline
+      \itemize 3. \quad \quad \quad FIM      \newline
+      \itemize 4. retorne FALSO
+  \end{itemize}
+  
+  No pior caso, o pseudocódigo acima fará a verificação de todos os literais de todas as cláusulas. Tomando n como o número total de literais $\varphi$, o pior caso do algoritmo possui complexidade O(n).
+  
+  Sabendo que 2-SAT $\in$ P, como foi mostrado na questão 1, e que conseguimos reduzir instâncias de 2-SAT em instâncias de 3-SAT por meio da transformação $t$, além de podermos reduzir instâncias de 3-SAT em FNCX-SAT por meio da transformação $r$, temos que FNCX-SAT $\in$ P.
   }
 \end{enumerate}
 
