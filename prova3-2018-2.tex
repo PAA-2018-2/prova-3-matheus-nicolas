@@ -199,15 +199,27 @@ E todas as reduções (de 3-SAT para $Q'$, de $Q'$ para $Q$ e de $Q$ para HAM-CY
   \end{tabular}
   \end{center}
   
-  Essa transformação é possível de ser realizada em tempo polinomial:
+  Essa transformação é possível de ser realizada em tempo polinomial. Em uma entrada $\varphi$ que possui $C$ cláusulas da forma $l_1, l_2, ..., l_n$, temos:
   \begin{itemize}
-      \itemize 1. Para cada cláusula $C$ de uma entrada $\varphi$ faça      \newline
-      \itemize 2. \quad se algum literal de $C$ possui valor de verdade FALSO então      \newline
-      \itemize 3. \quad \quad \quad FIM      \newline
-      \itemize 4. retorne FALSO
+      \itemize 1. Para cada par $l_i$, $l_i_+_1$ de cada cláusula $C$ de uma entrada $\varphi$ faça      \newline
+      \itemize 2. \quad se ambos os literais possuem valor de verdade VERDADEIRO então      \newline
+      \itemize 3. \quad \quad \quad Mude o valor resultante da operação $V_r__o_p$ para FALSO      \newline
+      \itemize 4. retorne $V_r__o_p$ 
   \end{itemize}
   
-  No pior caso, o pseudocódigo acima fará a verificação de todos os literais de todas as cláusulas. Tomando n como o número total de literais $\varphi$, o pior caso do algoritmo possui complexidade O(n).
+  Para generalizar uma instância advinda de 3-SAT para um FNCX-k-SAT, adicionamos $n-k$ literais à cada cláusula e aplicamos a transformação $r$ aos literais das cláusulas tomados dois a dois:
+  
+  \begin{itemize}
+      \itemize 1. Para cada cláusula $C$ em $\varphi$ faça: \newline
+      \itemize 2. \quad Adicione um literal $l$ à cláusula $C$ \newline
+      \itemize 3. Para os $k$ literais resultantes de cada cláusula $C$ de $\varphi$, faça: \newline
+      \itemize 4. \quad Tome os literais $l_i$ e $l_i_+_1$ e aplique a transformação $r$, resultando em $res_i_,_i_+_1$ \newline
+      \itemize 5. \quad Aplique o passo 2 sucessivamente até o literal $l_k$ da cláusula $C$
+  \end{itemize}
+  
+  Para um cláusula $C$ de $n$ literais, teremos $n-1$ passos resultantes da transformação $r$. Supondo que adicionamos um número $n-k$ finito de literais à cada cláusula de $\varphi$, temos que a complexidade resultante do procedimento acima será $$(n-1).(n-k) \quad para  k finito$$ $$O(n^2)$$.
+  
+  %No pior caso, o pseudocódigo acima fará a verificação de todos os literais de todas as cláusulas. Tomando n como o número total de literais de uma cláusula de $\varphi$, o pior caso do algoritmo possui complexidade O(n).
   
   Sabendo que 2-SAT $\in$ P, como foi mostrado na questão 1, e que conseguimos reduzir instâncias de 2-SAT em instâncias de 3-SAT por meio da transformação $t$, além de podermos reduzir instâncias de 3-SAT em FNCX-SAT por meio da transformação $r$, temos que FNCX-SAT $\in$ P.
   }
