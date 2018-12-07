@@ -7,6 +7,7 @@
 \usepackage[all]{xy}
 \usepackage{color}
 \usepackage{enumitem}
+\usepackage{graphicx}
 
 \newcommand{\resposta}[1]{ \noindent {\bf Solução}.{\color{blue} #1}}
 
@@ -85,7 +86,7 @@ $$\begin{array}{|c|c|c|c|c|c|c|c|}\hline
     CLIQUE 
   }$$
   
-  Um ciclo Hamiltoniano é um ciclo simple que visita cada vértice de
+  Um ciclo Hamiltoniano é um ciclo simples que visita cada vértice de
   um grafo exatamente uma vez. Considere o problema de decisão
   HAM-CYCLE que pergunta se um dado grafo (não-dirigido) $G$ possui um
   ciclo Hamiltoniano. Mostre que HAM-CYCLE é um problema
@@ -108,7 +109,20 @@ $$\xymatrix{
 E todas as reduções (de 3-SAT para $Q'$, de $Q'$ para $Q$ e de $Q$ para HAM-CYCLE) devem ser detalhadas na sua solução.
 
 \resposta{
-    Escreva aqui sua solução.
+    Sabemos que HAM-CYCLE $\in$ NP, pois basta assegurar que, partindo de um vértice X, visitando cada vértice adjacente e seus vizinhos e retornando a X ao final, garantindo que todos os vértices em V foram visitados uma vez só, exceto X, que deve ser o vértice de partida e o de chegada. Essa análise pode ser realizada em tempo polinomial, por exemplo, por um Autômato Finito Não-Determinístico.
+    
+    Para mostrar que HAM-CYCLE é NP-Completo, basta reduzir de 3-SAT. Para tanto, é necessário modelar uma instância de 3-SAT em um grafo $G$. Fazemos isso plotando $G$ como um grafo que represente cada literal presente na fórmula de entrada como uma cadeia de possíveis estados - Verdadeiro ou Falso. Utilizaremos esses estados e a direção das arestas para modelar as cláusulas da entrada de 3-SAT. Representamos a presença de determinado literal em uma cláusula linkando o nó que representa esse literal com o nó-cláusula correspondente - a direção das arestas dessa ligação diz se o literal está negado ou não. A Figura 1 exemplifica o descrito:
+    
+    \begin{figure}[!h]
+        \centering
+        \includegraphics[scale=0.5]{sat.PNG}
+        \caption{Descrição Grafo}
+    \end{figure}
+    
+    Codificamos uma atribuição de valores de verdade para os literais presentes no grafo por meio de um \textit{Caminho Hamiltoniano}. O ponto é que só conseguimos visitar um nó-cláusula se conseguimos satisfazer a cláusula respectiva. Também sabemos que um ciclo Hamiltoniano visita todos os nós do grafo - e, portanto, visita todos os nós-cláusula. Com isso, concluímos que o grafo apenas possuirá um ciclo Hamiltoniano se a instância 3-SAT de entrada possuir uma atribuição de valor de verdade que a satisfaça.
+    
+    Dessa forma, conseguimos mostrar que é possível reduzir HAM-CYCLE para 3-SAT, e, portanto que HAM-CYCLE é NP-Completo.
+    
   }
   
 \item {\bf (2.5 pontos)} Considere o seguinte jogo em um grafo
